@@ -1,0 +1,108 @@
+<div class="container-fluid console" ng-controller="logtrail6">
+  <div class="alert alert-danger logtrail-error" ng-show="errorMessage != null">
+    <a ng-click="errorMessage = null" class="close" data-dismiss="alert" aria-label="close">&times;</a>
+    <strong>Error! </strong> {{ errorMessage }}
+  </div>
+  <div class='no-event-message' ng-show='events.length !== 0 && firstEventReached'>Oldest event reached.</div>
+  <div class='no-event-message' ng-show='showNoEventsMessage'>No events found.
+    <br>
+    <div ng-show="isTimeRangeSearch()" class='time-range'>Time range searched: {{ noEventErrorStartTime }} to Now </div>
+  </div>
+  <ul class="events">
+    <li id="{{ event.id }}" ng-repeat="event in events" on-last-repeat infinite-scroll>
+      <time class='time'>{{ event.display_timestamp }}</time>
+      <span class='host'><a href ng-click="onHostSelected(event.hostname)">{{ event.hostname }}</a></span>
+      <!--<span class='program'><a ng-click="onProgramClick(event.program)">{{ event.program }}:</a></span>-->
+      <span class='level'><a ng-click="onLevelSelected(event.level)">{{ event.level }}:</a></span>
+      <span class="message" ng-style="event.color? {color: event.color} : ''" ng-bind-html="event.message | ansiToHtml" compile-template
+      />
+    </li>
+  </ul>
+
+  <div class="footer">
+    <form class="form-inline search-form" ng-submit="onSearchClick()">
+      <div class="flex-container-search">
+        <input type="text" ng-model="userSearchText" class="search-box form-control" ng-class="userSearchText !== null && userSearchText.length > 0 ? '' : hint"
+          placeholder='"查找关键字1" "查找关键字2"' title='默认查询message字段'></input>
+        <div ng-hide="userSearchText !== null && userSearchText.length > 0" class="lucene-hint">
+          <a href="https://www.elastic.co/guide/en/elasticsearch/reference/5.6/query-dsl-query-string-query.html#query-string-syntax"
+            target="_blank">query syntax help</a>
+        </div>
+        <button class="submit btn search-btn flex-item-search">Search</button>
+
+        <button type="button" id="settings-btn" class="btn settings-select-btn btn flex-item-search">
+		  {{selected_index_pattern == null ? 'Index Pattern' : selected_index_pattern}}</button>
+        <button type="button" id="host-picker-btn" class="btn host-option-select-btn flex-item-search">
+          {{selectedHost == null ? 'ALL SYSTEMS' : selectedHost}}</button>
+        <button type="button" id="level-picker-btn" class="btn level-option-select-btn flex-item-search">
+          {{selectedLevel == null ? 'ALL LEVELS' : selectedLevel}}</button>
+        <button type="button" id="date-picker-btn" class="time-option-select-btn btn flex-item-search">
+          {{ isNullorEmpty(userDateTimeSeeked) ? 'TIME NOW' : userDateTimeSeeked }}</button>
+      </div>
+    </form>
+	
+    <div class="date-picker ng-hide" id="date-picker" click-outside>
+      <form class="form-inline" ng-submit="seekAndSearch()">
+        <div class="flex-container-date-picker">
+          <input class="flex-item-date-picker date-picker-box form-control" type="search" placeholder='7:02 am,last friday,jun 9 1:16pm'
+            ng-model="userDateTime" ng-change="onDateChange()"></input>
+          <button class="btn flex-item-date-picker date-picker-submit-btn submit">Seek To</button>
+          <label class="flex-item-date-picker date-picker-message" ng-class="{ 'date-picker-message-error' : !isNullorEmpty(userDateTime)  && (pickedDateTime == null) }">
+            {{ (isNullorEmpty(userDateTime)) ? 'Right now' : (pickedDateTime == null ? 'Cannot parse date time' : pickedDateTime)}}</label>
+        </div>
+      </form>
+    </div>
+
+    <div class="host-picker ng-hide" id="host-picker" click-outside>
+      <ul class="host-picker-list">
+        <li ng-repeat="host in hosts" ng-hide="hostSearchText != null && !host.includes(hostSearchText)">
+          <a href ng-click="onHostSelected(host)">{{host}}</a>
+        </li>
+      </ul>
+      <ul class="host-picker-list">
+        <li>
+          <a href ng-click="onHostSelected('*')"> [ ALL SYSTEMS ] </a>
+        </li>
+        <li ng-hide="hosts.length < 11">
+          <input class="host-picker-search" type="search" name="host-search-input" ng-model="hostSearchText" />
+        </li>
+      </ul>
+    </div>
+
+	<div class="level-picker ng-hide" id="level-picker" click-outside>
+      <ul class="level-picker-list">
+        <li>
+          <a href ng-click="onLevelSelected('ERROR')"> [ ERROR ] </a>
+        </li>
+		<li>
+          <a href ng-click="onLevelSelected('WARN')"> [ WARN ] </a>
+        </li>
+		<li>
+          <a href ng-click="onLevelSelected('INFO')"> [ INFO ] </a>
+        </li>
+		<li>
+          <a href ng-click="onLevelSelected('DEBUG')"> [ DEBUG ] </a>
+        </li>
+		<li>
+          <a href ng-click="onLevelSelected('*')"> [ ALL LEVELS ] </a>
+        </li>
+      </ul>
+    </div>
+
+    <div class="settings ng-hide" id="settings" click-outside>
+      <form class="form-inline" ng-submit="onSettingsChange()">
+        <div class="flex-container-settings">
+          <label class="index-label flex-item-settings">Index Pattern</label>
+          <select class="index-select flex-item-settings" ng-model="selected_index_pattern">
+            <option ng-repeat="index in index_patterns" ng-value="index">{{index}}</option>
+          </select>
+          <button class="btn flex-item-settings submit">Ok</button>
+        </div>
+      </form>
+    </div>
+
+    <div class="pull-right live-tail-button">
+      <i ng-click="toggleLiveTail()" class="fa fa-3x" ng-class="getLiveTailIcon()"></i>
+    </div>
+  </div>
+</div>

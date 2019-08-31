@@ -1,0 +1,71 @@
+{
+  "version" : 2,
+  "index_patterns" : [
+    {      
+      "es": {
+        "default_index": "app-java-dev-*"
+      },
+      "tail_interval_in_seconds": 5,
+      "es_index_time_offset_in_seconds": 0,
+      "display_timezone": "Asia/Shanghai",
+      "display_timestamp_format": "YYYY-MM-DD HH:mm:ss",
+      "max_buckets": 500,
+      "default_time_range_in_days" : 0,
+      "max_hosts": 100,
+      "max_events_to_keep_in_viewer": 300,
+      "fields" : {
+        "mapping" : {
+            "timestamp" : "@timestamp",
+            "hostname" : "source",
+            "program": "source",
+            "level": "level",
+            "message": "message"
+        },
+        "message_format": "{{{message}}} {{{throwable}}}"
+      },
+      "color_mapping" : {        
+	    "field" : "level",
+        "mapping" : {
+          "ERROR": "#bc2929",
+          "INFO": "#b0b0b0",
+          "WARN": "#86634a",
+          "DEBUG": "#714e17",
+          "TRACE": "#a2cd5a"
+         }
+      }
+    },
+    {      
+      "es": {
+        "default_index": "app-java-test-*"
+      },
+      "tail_interval_in_seconds": 5,
+      "es_index_time_offset_in_seconds": 0,
+      "display_timezone": "Asia/Shanghai",
+      "display_timestamp_format": "YYYY-MM-DD HH:mm:ss",
+      "max_buckets": 500,
+      "default_time_range_in_days" : 0,
+      "max_hosts": 100,
+      "max_events_to_keep_in_viewer": 300,
+      "fields" : {
+        "mapping" : {
+            "timestamp" : "@timestamp",
+            "hostname" : "source",
+            "program": "source",
+            "level": "level",
+            "message": "message"
+        },
+        "message_format": "{{{message}}} {{{throwable}}}"
+      },
+      "color_mapping" : {        
+	    "field" : "level",
+        "mapping" : {
+          "ERROR": "#bc2929",
+          "INFO": "#b0b0b0",
+          "WARN": "#86634a",
+          "DEBUG": "#714e17",
+          "TRACE": "#a2cd5a"
+         }
+      }
+    }
+  ]
+}
