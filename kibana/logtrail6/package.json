@@ -16,7 +16,7 @@
   },
   "dependencies": {
     "ansi-to-html": "^0.6.4",
-    "handlebars": "4.0.6",
+    "handlebars": "4.0.14",
     "lodash.escape": "4.0.1",
     "lodash.get": "4.4.2",
     "lodash.set": "4.3.2",
